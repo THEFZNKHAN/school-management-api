@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Management API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #0056b3;
+        }
+        form {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .response-box {
+            background-color: #e9e9e9;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            margin-top: 10px;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>School Management API</h1>
+        <p>Welcome to the School Management API. Use the forms below to interact with the API endpoints.</p>
+
+        <h2>Add New School</h2>
+        <form id="addSchoolForm">
+            <label for="name">School Name:</label>
+            <input type="text" id="name" name="name" required><br>
+
+            <label for="address">Address:</label>
+            <input type="text" id="address" name="address" required><br>
+
+            <label for="latitude">Latitude:</label>
+            <input type="number" id="latitude" name="latitude" step="any" required><br>
+
+            <label for="longitude">Longitude:</label>
+            <input type="number" id="longitude" name="longitude" step="any" required><br>
+
+            <button type="submit">Add School</button>
+        </form>
+        <div class="response-box" id="addSchoolResponse"></div>
+
+        <h2>List Schools by Proximity</h2>
+        <form id="listSchoolsForm">
+            <label for="userLatitude">Your Latitude:</label>
+            <input type="number" id="userLatitude" name="latitude" step="any" required><br>
+
+            <label for="userLongitude">Your Longitude:</label>
+            <input type="number" id="userLongitude" name="longitude" step="any" required><br>
+
+            <button type="submit">List Schools</button>
+        </form>
+        <div class="response-box" id="listSchoolsResponse"></div>
+
+        <script>
+            document.getElementById('addSchoolForm').addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const form = event.target;
+                const data = {
+                    name: form.name.value,
+                    address: form.address.value,
+                    latitude: parseFloat(form.latitude.value),
+                    longitude: parseFloat(form.longitude.value)
+                };
+
+                try {
+                    const response = await fetch('/api/addSchool', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    const result = await response.json();
+                    document.getElementById('addSchoolResponse').textContent = JSON.stringify(result, null, 2);
+                } catch (error) {
+                    document.getElementById('addSchoolResponse').textContent = 'Error: ' + error.message;
+                }
+            });
+
+            document.getElementById('listSchoolsForm').addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const form = event.target;
+                const userLatitude = parseFloat(form.userLatitude.value);
+                const userLongitude = parseFloat(form.userLongitude.value);
+
+                try {
+                    const response = await fetch(`/api/listSchools?latitude=${userLatitude}&longitude=${userLongitude}`);
+                    const result = await response.json();
+                    document.getElementById('listSchoolsResponse').textContent = JSON.stringify(result, null, 2);
+                } catch (error) {
+                    document.getElementById('listSchoolsResponse').textContent = 'Error: ' + error.message;
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>
